@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.nms.dao.CrisisDataDao">
+    
+	<sql id="crisisDataColumns">
+		a.id AS "id",
+		a.auto_id AS "autoId",
+		a.fk_office_id AS "office.id",
+		a.customer_id AS "customerId",
+		a.customer_name AS "customerName",
+		a.weibo_id AS "weiBoId",
+		a.content AS "content",
+		a.page_url AS "pageUrl",
+		a.comment_time AS "commentTime",
+		a.source_host_name AS "sourceHostName",
+		a.source_host AS "sourceHost",
+		a.crisis_level AS "crisisLevel",
+		a.reposts_count AS "repostsCount",
+		a.comments_count AS "commentsCount",
+		a.attitudes_count AS "attitudesCount",
+		a.create_date AS "createDate",
+		a.create_by AS "createBy.id",
+		a.update_date AS "updateDate",
+		a.update_by AS "updateBy.id",
+		a.del_flag AS "delFlag",
+		a.remarks AS "remarks"
+	</sql>
+	
+	<sql id="crisisDataJoins">
+		LEFT JOIN sys_office on sys_office.id=a.fk_office_id
+	</sql>
+    
+	<select id="get" resultType="CrisisData">
+		SELECT 
+			<include refid="crisisDataColumns"/>
+		FROM crisis_data a
+		<include refid="crisisDataJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CrisisData">
+		SELECT 
+			<include refid="crisisDataColumns"/>
+		FROM crisis_data a
+		<include refid="crisisDataJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="autoId !=null">
+				and a.auto_id=#{autoId}
+			</when>
+		</choose>
+		<choose>
+			<when test="weiBoId !=null and weiBoId != ''">
+				and a.weibo_id=#{weiBoId}
+			</when>
+		</choose>
+		<choose>
+			<when test="office !=null and office.id != null and  office.id != ''">
+				and a.fk_office_id=#{office.id}
+			</when>
+		</choose>
+		ORDER BY a.auto_id ASC
+	</select>
+	
+	<select id="findAllList" resultType="CrisisData">
+		SELECT 
+			<include refid="crisisDataColumns"/>
+		FROM crisis_data a
+		<include refid="crisisDataJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO crisis_data(
+			id,
+			fk_office_id,
+			customer_id,
+			customer_name,
+			weibo_id,
+			content,
+			page_url,
+			comment_time,
+			source_host_name,
+			source_host,
+			crisis_level,
+			reposts_count,
+	        comments_count,
+		    attitudes_count,
+			create_date,
+			create_by,
+			update_date,
+			update_by,
+			del_flag,
+			remarks
+		) VALUES (
+			#{id},
+			#{office.id},
+			#{customerId},
+			#{customerName},
+			#{weiBoId},
+			#{content},
+			#{pageUrl},
+			#{commentTime},
+			#{sourceHostName},
+			#{sourceHost},
+			#{crisisLevel},
+			#{repostsCount},
+			#{commentsCount},
+			#{attitudesCount},
+			#{createDate},
+			#{createBy.id},
+			#{updateDate},
+			#{updateBy.id},
+			#{delFlag},
+			#{remarks}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE crisis_data SET 	
+			customer_id = #{customerId},
+			fk_office_id = #{office.id},
+			customer_name = #{customerName},
+			weibo_id = #{weiBoId},
+			content = #{content},
+			page_url = #{pageUrl},
+			comment_time = #{commentTime},
+			source_host_name = #{sourceHostName},
+			source_host = #{sourceHost},
+			crisis_level = #{crisisLevel},
+			reposts_count = #{repostsCount},
+			comments_count = #{commentsCount},
+			attitudes_count = #{attitudesCount},
+			update_date = #{updateDate},
+			update_by = #{updateBy.id},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE crisis_data SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

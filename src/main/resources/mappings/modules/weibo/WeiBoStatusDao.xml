@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.weibo.dao.WeiBoStatusDao">
+    
+	<sql id="weiBoStatusColumns">
+		a.id AS "id",
+		a.text AS "text",
+		a.keyword AS "keyword",
+		a.weibo_user_id AS "weiboUserId",
+		a.screen_name AS "screenName",
+		a.created_at AS "createdAt",
+		a.create_date AS "createDate",
+		a.create_by AS "createBy.id",
+		a.update_date AS "updateDate",
+		a.update_by AS "updateBy.id",
+		a.del_flag AS "delFlag",
+		a.remarks AS "remarks"
+	</sql>
+	
+	<sql id="weiBoStatusJoins">
+	</sql>
+    
+	<select id="get" resultType="WeiBoStatus">
+		SELECT 
+			<include refid="weiBoStatusColumns"/>
+		FROM weibo_status a
+		<include refid="weiBoStatusJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="WeiBoStatus">
+		SELECT 
+			<include refid="weiBoStatusColumns"/>
+		FROM weibo_status a
+		<include refid="weiBoStatusJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="id !=null and id != ''">
+				and a.id =#{id}
+			</when>
+		</choose>
+		<choose>
+			<when test="keyword !=null and keyword != ''">
+				and a.keyword =#{keyword}
+			</when>
+		</choose>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="WeiBoStatus">
+		SELECT 
+			<include refid="weiBoStatusColumns"/>
+		FROM weibo_status a
+		<include refid="weiBoStatusJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO weibo_status(
+			id,
+			text,
+			keyword,
+			weibo_user_id,
+			screen_name,
+			created_at,
+			create_date,
+			create_by,
+			update_date,
+			update_by,
+			del_flag,
+			remarks
+		) VALUES (
+			#{id},
+			#{text},
+			#{keyword},
+			#{weiboUserId},
+			#{screenName},
+			#{createdAt},
+			#{createDate},
+			#{createBy.id},
+			#{updateDate},
+			#{updateBy.id},
+			#{delFlag},
+			#{remarks}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE weibo_status SET 	
+			text = #{text},
+			keyword = #{keyword},
+			weibo_user_id = #{weiboUserId},
+			screen_name = #{screenName},
+			created_at = #{createdAt},
+			update_date = #{updateDate},
+			update_by = #{updateBy.id},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE weibo_status SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

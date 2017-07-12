@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.nms.dao.CrisisDisposeDao">
+
+    <sql id="crisisDisposeColumns">
+		a.id AS "id",
+		a.fk_crisis_data_id AS "crisisData.id",
+		d.customer_id AS "crisisData.customerId",
+		d.customer_name AS "crisisData.customerName",
+		d.content AS "crisisData.content",
+		d.auto_id AS "crisisData.autoId",
+		d.weibo_id AS "crisisData.weiBoId",
+		d.page_url AS "crisisData.pageUrl",
+		d.comment_time AS "crisisData.commentTime",
+		d.crisis_level AS "crisisData.crisisLevel",
+		d.source_host_name AS "crisisData.sourceHostName",
+		a.fk_sys_user_id AS "user.id",
+		u.name AS "user.name",
+		a.action_status AS "actionStatus",
+		a.issue_status AS "issueStatus",
+		a.customer_status AS "customerStatus",
+		a.reply AS "reply",
+		a.response_time AS "responseTime",
+		a.response_hour_diff AS "responseHourDiff",
+		a.reply_time AS "replyTime",
+		a.reply_hour_diff AS "replyHourDiff",
+		a.solve_time AS "solveTime",
+		a.solve_hour_diff AS "solveHourDiff",
+		a.create_date AS "createDate",
+		a.create_by AS "createBy.id",
+		a.update_date AS "updateDate",
+		a.update_by AS "updateBy.id",
+		a.del_flag AS "delFlag"
+	</sql>
+
+    <sql id="crisisDisposeJoins">
+		INNER JOIN sys_user as u on u.id=a.fk_sys_user_id
+		INNER JOIN crisis_data as d on d.id=a.fk_crisis_data_id
+	</sql>
+
+    <select id="get" resultType="CrisisDispose">
+        SELECT
+        <include refid="crisisDisposeColumns"/>
+        FROM crisis_dispose a
+        <include refid="crisisDisposeJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="countNum" resultType="java.util.Map">
+        SELECT
+        a.fk_sys_user_id,
+        u.name,
+        o.name as officeName,
+        Date(d.comment_time) as commentDay,
+        SUM(case when a.customer_status ='1' THEN 1 ELSE 0 END) as solvedCnt,
+        SUM(case when a.customer_status ='0' THEN 1 ELSE 0 END) as unsolvedCnt
+        FROM crisis_dispose a
+        INNER JOIN crisis_data as d on d.id=a.fk_crisis_data_id
+        Inner JOIN sys_user as u on u.id=a.fk_sys_user_id
+        Inner JOIN sys_office as o on o.id=u.office_id
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>
+        <choose>
+            <when test="startDate !=null and endDate != null">
+                and (Date(d.comment_time) BETWEEN #{startDate} AND #{endDate})
+            </when>
+        </choose>
+        group by a.fk_sys_user_id,Date(d.comment_time)
+    </select>
+    <select id="monthCnt" resultType="java.util.Map">
+        SELECT
+        a.fk_sys_user_id,
+        u.name,
+        o.name as officeName,
+        YEAR (d.comment_time) as commentYear,
+        MONTH (d.comment_time) as commentMonth,
+        SUM(case when a.customer_status ='1' THEN 1 ELSE 0 END) as solvedCnt,
+        SUM(case when a.customer_status ='0' THEN 1 ELSE 0 END) as unsolvedCnt
+        FROM crisis_dispose a
+        INNER JOIN crisis_data as d on d.id=a.fk_crisis_data_id
+        Inner JOIN sys_user as u on u.id=a.fk_sys_user_id
+        Inner JOIN sys_office as o on o.id=u.office_id
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>
+        <choose>
+            <when test="startDate !=null and endDate != null">
+                and (Date(d.comment_time) BETWEEN #{startDate} AND #{endDate})
+            </when>
+        </choose>
+        group by a.fk_sys_user_id,YEAR (d.comment_time),MONTH (d.comment_time)
+    </select>
+    <select id="countNumGroupByOffice" resultType="java.util.Map">
+        SELECT
+        o.name as officeName,
+        Date(d.comment_time) as commentDay,
+        SUM(case when a.customer_status ='1' THEN 1 ELSE 0 END) as solvedCnt,
+        SUM(case when a.customer_status ='0' THEN 1 ELSE 0 END) as unsolvedCnt
+        FROM crisis_dispose a
+        INNER JOIN crisis_data as d on d.id=a.fk_crisis_data_id
+        Inner JOIN sys_user as u on u.id=a.fk_sys_user_id
+        Inner JOIN sys_office as o on o.id=u.office_id
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>
+        <choose>
+            <when test="startDate !=null and endDate != null">
+                and (Date(d.comment_time) BETWEEN #{startDate} AND #{endDate})
+            </when>
+        </choose>
+        group by o.id,Date(d.comment_time)
+    </select>
+
+    <select id="monthCntGroupByOffice" resultType="java.util.Map">
+        SELECT
+        o.name as officeName,
+        YEAR (d.comment_time) as commentYear,
+        MONTH(d.comment_time) as commentMonth,
+        SUM(case when a.customer_status ='1' THEN 1 ELSE 0 END) as solvedCnt,
+        SUM(case when a.customer_status ='0' THEN 1 ELSE 0 END) as unsolvedCnt
+        FROM crisis_dispose a
+        INNER JOIN crisis_data as d on d.id=a.fk_crisis_data_id
+        Inner JOIN sys_user as u on u.id=a.fk_sys_user_id
+        Inner JOIN sys_office as o on o.id=u.office_id
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>
+        <choose>
+            <when test="startDate !=null and endDate != null">
+                and (Date(d.comment_time) BETWEEN #{startDate} AND #{endDate})
+            </when>
+        </choose>
+        group by o.id,YEAR (d.comment_time),MONTH(d.comment_time)
+    </select>
+
+    <select id="findList" resultType="CrisisDispose">
+        SELECT
+        <include refid="crisisDisposeColumns"/>
+        FROM crisis_dispose a
+        <include refid="crisisDisposeJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL} and d.del_flag = #{DEL_FLAG_NORMAL}
+        </where>
+        <if test="user!=null and user.id != ''">
+            and a.fk_sys_user_id=#{user.id}
+        </if>
+        <if test="crisisData !=null and crisisData.autoId !=null">
+            and d.auto_id=#{crisisData.autoId}
+        </if>
+        <if test="crisisData !=null and crisisData.crisisLevel !=null">
+            and d.crisis_level=#{crisisData.crisisLevel}
+        </if>
+        <if test="issueStatus !=null and issueStatus != ''">
+            and a.issue_status=#{issueStatus}
+        </if>
+        <if test="customerStatus !=null and customerStatus != ''">
+            and a.customer_status=#{customerStatus}
+        </if>
+        <if test="actionStatus !=null and actionStatus != ''">
+            and a.action_status=#{actionStatus}
+        </if>
+        <if test="office !=null and office.id != ''">
+            and d.fk_office_id=#{office.id}
+        </if>
+        <if test="startDate !=null and endDate != null">
+            and (Date(d.comment_time) BETWEEN #{startDate} AND #{endDate})
+        </if>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY d.comment_time DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findAllList" resultType="CrisisDispose">
+        SELECT
+        <include refid="crisisDisposeColumns"/>
+        FROM crisis_dispose a
+        <include refid="crisisDisposeJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <insert id="insert">
+		INSERT INTO crisis_dispose(
+			id,
+			fk_crisis_data_id,
+			fk_sys_user_id,
+			action_status,
+			issue_status,
+			customer_status,
+			reply,
+			response_time,
+			response_hour_diff,
+			reply_time,
+		    reply_hour_diff,
+			solve_time,
+			solve_hour_diff,
+			create_date,
+			create_by,
+			update_date,
+			update_by,
+			del_flag
+		) VALUES (
+			#{id},
+			#{crisisData.id},
+			#{user.id},
+			#{actionStatus},
+			#{issueStatus},
+			#{customerStatus},
+			#{reply},
+			#{responseTime},
+			#{responseHourDiff},
+			#{replyTime},
+			#{replyHourDiff},
+			#{solveTime},
+			#{solveHourDiff},
+			#{createDate},
+			#{createBy.id},
+			#{updateDate},
+			#{updateBy.id},
+			#{delFlag}
+		)
+	</insert>
+
+    <update id="update">
+		UPDATE crisis_dispose SET 	
+			fk_crisis_data_id = #{crisisData.id},
+			fk_sys_user_id = #{user.id},
+			action_status = #{actionStatus},
+			issue_status = #{issueStatus},
+			customer_status = #{customerStatus},
+			reply = #{reply},
+			response_time = #{responseTime},
+			response_hour_diff = #{responseHourDiff},
+			reply_time =#{replyTime},
+		    reply_hour_diff =#{replyHourDiff},
+			solve_time = #{solveTime},
+			solve_hour_diff = #{solveHourDiff},
+			update_date = #{updateDate},
+			update_by = #{updateBy.id}
+		WHERE id = #{id}
+	</update>
+
+    <update id="delete">
+		UPDATE crisis_dispose SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

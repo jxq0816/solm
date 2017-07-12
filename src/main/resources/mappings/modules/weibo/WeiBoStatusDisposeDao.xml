@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.weibo.dao.WeiBoStatusDisposeDao">
+    
+	<sql id="weiBoStatusDisposeColumns">
+		a.id AS "id",
+		a.auto_id AS "autoId",
+		a.fk_weibo_status_id AS "weiBoStatus.id",
+		s.text AS "weiBoStatus.text",
+		s.created_at AS "weiBoStatus.createdAt",
+		a.fk_sys_user_id AS "user.id",
+		u.name AS "user.name",
+		a.action_status AS "actionStatus",
+		a.issue_status AS "issueStatus",
+		a.customer_status AS "customerStatus",
+		a.reply AS "reply",
+		a.response_time AS "responseTime",
+		a.response_hour_diff AS "responseHourDiff",
+		a.reply_time AS "replyTime",
+		a.reply_hour_diff AS "replyHourDiff",
+		a.solve_time AS "solveTime",
+		a.solve_hour_diff AS "solveHourDiff",
+		a.create_date AS "createDate",
+		a.create_by AS "createBy.id",
+		a.source_host_name AS "sourceHostName",
+		a.crisis_level AS "crisisLevel",
+		a.update_date AS "updateDate",
+		a.update_by AS "updateBy.id",
+		a.reposts_count AS "repostsCount",
+		a.attitudes_count AS "attitudesCount",
+		a.del_flag AS "delFlag",
+		a.comments_count AS "commentsCount"
+	</sql>
+	
+	<sql id="weiBoStatusDisposeJoins">
+		INNER JOIN weibo_status as s ON s.id=a.fk_weibo_status_id
+		INNER JOIN sys_user as u ON u.id=a.fk_sys_user_id
+	</sql>
+    
+	<select id="get" resultType="WeiBoStatusDispose">
+		SELECT 
+			<include refid="weiBoStatusDisposeColumns"/>
+		FROM weibo_status_dispose a
+		<include refid="weiBoStatusDisposeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="WeiBoStatusDispose">
+		SELECT 
+			<include refid="weiBoStatusDisposeColumns"/>
+		FROM weibo_status_dispose a
+		<include refid="weiBoStatusDisposeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<if test="autoId!=null and autoId!=''">
+			and a.auto_id=#{autoId}
+		</if>
+		<if test="crisisLevel!=null and crisisLevel!=''">
+			and a.crisis_level=#{crisisLevel}
+		</if>
+		<if test="issueStatus !=null and issueStatus != ''">
+			and a.issue_status=#{issueStatus}
+		</if>
+		<if test="customerStatus !=null and customerStatus != ''">
+			and a.customer_status=#{customerStatus}
+		</if>
+		<if test="actionStatus !=null and actionStatus != ''">
+			and a.action_status=#{actionStatus}
+		</if>
+		<if test="startDate !=null and endDate != null">
+			and (Date(s.created_at) BETWEEN #{startDate} AND #{endDate})
+		</if>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="WeiBoStatusDispose">
+		SELECT 
+			<include refid="weiBoStatusDisposeColumns"/>
+		FROM weibo_status_dispose a
+		<include refid="weiBoStatusDisposeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO weibo_status_dispose(
+			id,
+			auto_id,
+			fk_weibo_status_id,
+			fk_sys_user_id,
+			action_status,
+			issue_status,
+			customer_status,
+			reply,
+			response_time,
+			response_hour_diff,
+			reply_time,
+			reply_hour_diff,
+			solve_time,
+			solve_hour_diff,
+			create_date,
+			create_by,
+			source_host_name,
+			crisis_level,
+			update_date,
+			update_by,
+			reposts_count,
+			attitudes_count,
+			del_flag,
+			comments_count
+		) VALUES (
+			#{id},
+			#{autoId},
+			#{weiBoStatus.id},
+			#{user.id},
+			#{actionStatus},
+			#{issueStatus},
+			#{customerStatus},
+			#{reply},
+			#{responseTime},
+			#{responseHourDiff},
+			#{replyTime},
+			#{replyHourDiff},
+			#{solveTime},
+			#{solveHourDiff},
+			#{createDate},
+			#{createBy.id},
+			#{sourceHostName},
+			#{crisisLevel},
+			#{updateDate},
+			#{updateBy.id},
+			#{repostsCount},
+			#{attitudesCount},
+			#{delFlag},
+			#{commentsCount}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE weibo_status_dispose SET 	
+			auto_id = #{autoId},
+			fk_weibo_status_id = #{weiBoStatus.id},
+			fk_sys_user_id = #{user.id},
+			action_status = #{actionStatus},
+			issue_status = #{issueStatus},
+			customer_status = #{customerStatus},
+			reply = #{reply},
+			response_time = #{responseTime},
+			response_hour_diff = #{responseHourDiff},
+			reply_time = #{replyTime},
+			reply_hour_diff = #{replyHourDiff},
+			solve_time = #{solveTime},
+			solve_hour_diff = #{solveHourDiff},
+			source_host_name = #{sourceHostName},
+			crisis_level = #{crisisLevel},
+			update_date = #{updateDate},
+			update_by = #{updateBy.id},
+			reposts_count = #{repostsCount},
+			attitudes_count = #{attitudesCount},
+			comments_count = #{commentsCount}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE weibo_status_dispose SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

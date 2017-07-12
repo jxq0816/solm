@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.weibo.dao.WeiBoMailDao">
+
+    <sql id="weiBoMailColumns">
+		a.id AS "id",
+		a.text AS "text",
+		a.receiver_id AS "receiverId",
+		a.receiver_name AS "receiverName",
+		a.sender_id AS "senderId",
+		a.sender_name AS "senderName",
+		a.created_at AS "createdAt",
+		a.create_by AS "createBy.id",
+		a.update_date AS "updateDate",
+		a.update_by AS "updateBy.id",
+		a.del_flag AS "delFlag",
+		a.remarks AS "remarks"
+	</sql>
+
+    <sql id="weiBoMailJoins">
+    </sql>
+
+    <select id="get" resultType="WeiBoMail">
+        SELECT
+        <include refid="weiBoMailColumns"/>
+        FROM weibo_mail a
+        <include refid="weiBoMailJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="findChartList" resultType="WeiBoMail">
+        SELECT
+        <include refid="weiBoMailColumns"/>
+        FROM weibo_mail a
+        <include refid="weiBoMailJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>
+        <choose>
+            <when test="senderId !=null and senderId != ''">
+                and (a.sender_id = #{senderId} or a.receiver_id = #{senderId})
+            </when>
+        </choose>
+        <choose>
+            <when test="startDate !=null and endDate != null">
+                and Date(a.created_at) BETWEEN Date(#{startDate}) and Date(#{endDate})
+            </when>
+        </choose>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date ASC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findFansChartList" resultType="WeiBoMail">
+        SELECT
+        a.sender_id AS "senderId",
+        a.text AS "text",
+        a.receiver_id AS "receiverId",
+        a.receiver_name AS "receiverName",
+        a.sender_name AS "senderName",
+        MAX(a.created_at) AS "createdAt",
+        a.create_by AS "createBy.id",
+        a.update_date AS "updateDate",
+        a.update_by AS "updateBy.id",
+        a.del_flag AS "delFlag",
+        a.remarks AS "remarks"
+        FROM weibo_mail a
+        <include refid="weiBoMailJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>
+        <choose>
+            <when test="senderId !=null and senderId != ''">
+                and a.sender_id = #{senderId}
+            </when>
+        </choose>
+        <choose>
+            <when test="senderName !=null and senderName != ''">
+                and a.sender_name = #{senderName}
+            </when>
+        </choose>
+        <choose>
+            <when test="receiverId !=null and receiverId != ''">
+                and a.receiver_id = #{receiverId}
+            </when>
+        </choose>
+        <choose>
+            <when test="receiverName !=null and receiverName != ''">
+                and a.receiver_name = #{receiverName}
+            </when>
+        </choose>
+        GROUP BY a.sender_id
+        ORDER BY a.created_at DESC
+    </select>
+
+    <select id="findList" resultType="WeiBoMail">
+        SELECT
+        <include refid="weiBoMailColumns"/>
+        FROM weibo_mail a
+        <include refid="weiBoMailJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>
+        <choose>
+            <when test="senderId !=null and senderId != ''">
+                and a.sender_id = #{senderId}
+            </when>
+        </choose>
+        <choose>
+            <when test="senderName !=null and senderName != ''">
+                and a.sender_name = #{senderName}
+            </when>
+        </choose>
+        <choose>
+            <when test="receiverId !=null and receiverId != ''">
+                and a.receiver_id = #{receiverId}
+            </when>
+        </choose>
+        <choose>
+            <when test="receiverName !=null and receiverName != ''">
+                and a.receiver_name = #{receiverName}
+            </when>
+        </choose>
+
+        <if test="startDate !=null and endDate != null">
+            and Date(a.created_at) BETWEEN Date(#{startDate}) and Date(#{endDate})
+        </if>
+
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findAllList" resultType="WeiBoMail">
+        SELECT
+        <include refid="weiBoMailColumns"/>
+        FROM weibo_mail a
+        <include refid="weiBoMailJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <insert id="insert">
+		INSERT INTO weibo_mail(
+			id,
+			text,
+			receiver_id,
+			receiver_name,
+			sender_id,
+			sender_name,
+			created_at,
+			create_by,
+			update_date,
+			update_by,
+			del_flag,
+			remarks
+		) VALUES (
+			#{id},
+			#{text},
+			#{receiverId},
+			#{receiverName},
+			#{senderId},
+			#{senderName},
+			#{createdAt},
+			#{createBy.id},
+			#{updateDate},
+			#{updateBy.id},
+			#{delFlag},
+			#{remarks}
+		)
+	</insert>
+
+    <update id="update">
+		UPDATE weibo_mail SET 	
+			text = #{text},
+			receiver_id = #{receiverId},
+			receiver_name = #{receiverName},
+			sender_id = #{senderId},
+			sender_name = #{senderName},
+			created_at = #{createdAt},
+			update_date = #{updateDate},
+			update_by = #{updateBy.id},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+    <update id="delete">
+		UPDATE weibo_mail SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

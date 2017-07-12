@@ -1,0 +1,16 @@
+一、数据入库接口参数列表
+originalcontent:原文 String
+screen_name:发文人 String
+createdtime:时间戳 long 1484479879
+source_host:来源主机url String weibo.com
+userid:发文人编号 String 1878546883
+source_hostname:来源主机名称 String 新浪微博
+page_url:原文地址 String http://weibo.com/1878546883/EqXQ6pAnt
+crisisLevel:危机级别 int
+
+
+
+二、危机数据状态
+问题状态 0：未处理 1：已处理 2：已上报 3：已转出 4：关闭
+客户状态 0：未解决 1：已解决
+动作状态 0：未处理 1：已处理

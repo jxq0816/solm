@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.weibo.dao.WeiboUserDao">
+    
+	<sql id="weiboUserColumns">
+		a.id AS "id",
+		a.screen_name AS "screenName",
+		a.name AS "name",
+		a.province AS "province",
+		a.city AS "city",
+		a.location AS "location",
+		a.description AS "description",
+		a.url AS "url",
+		a.profile_image_url AS "profileImageUrl",
+		a.user_domain AS "userDomain",
+		a.gender AS "gender",
+		a.followers_count AS "followersCount",
+		a.friends_count AS "friendsCount",
+		a.favourites_count AS "favouritesCount",
+		a.created_at AS "createdAt",
+		a.following AS "following",
+		a.verified AS "verified",
+		a.verified_type AS "verifiedType",
+		a.allow_all_act_msg AS "allowAllActMsg",
+		a.allow_all_comment AS "allowAllComment",
+		a.follow_me AS "followMe",
+		a.avatar_large AS "avatarLarge",
+		a.online_status AS "onlineStatus",
+		a.bi_followers_count AS "biFollowersCount",
+		a.lang AS "lang",
+		a.verified_reason AS "verifiedReason",
+		a.weihao AS "weihao",
+		a.status_id AS "statusId",
+		a.statuses_count AS "statusesCount",
+		a.create_date AS "createDate",
+		a.create_by AS "createBy.id",
+		a.update_date AS "updateDate",
+		a.update_by AS "updateBy.id",
+		a.del_flag AS "delFlag",
+		a.remarks AS "remarks",
+		a.unrank AS "unrank",
+		a.ability_tags AS "abilityTags"
+	</sql>
+	
+	<sql id="weiboUserJoins">
+	</sql>
+    
+	<select id="get" resultType="WeiboUser">
+		SELECT 
+			<include refid="weiboUserColumns"/>
+		FROM weibo_user a
+		<include refid="weiboUserJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="WeiboUser">
+		SELECT 
+			<include refid="weiboUserColumns"/>
+		FROM weibo_user a
+		<include refid="weiboUserJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="id != null and id != ''">
+				AND a.id =#{id}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE concat('%',#{name},'%')
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="WeiboUser">
+		SELECT 
+			<include refid="weiboUserColumns"/>
+		FROM weibo_user a
+		<include refid="weiboUserJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO weibo_user(
+			id,
+			screen_name,
+			name,
+			province,
+			city,
+			location,
+			description,
+			url,
+			profile_image_url,
+			user_domain,
+			gender,
+			followers_count,
+			friends_count,
+			favourites_count,
+			created_at,
+			following,
+			verified,
+			verified_type,
+			allow_all_act_msg,
+			allow_all_comment,
+			follow_me,
+			avatar_large,
+			online_status,
+			bi_followers_count,
+			lang,
+			verified_reason,
+			weihao,
+			status_id,
+			statuses_count,
+			create_date,
+			create_by,
+			update_date,
+			update_by,
+			del_flag,
+			remarks,
+			unrank,
+			ability_tags
+		) VALUES (
+			#{id},
+			#{screenName},
+			#{name},
+			#{province},
+			#{city},
+			#{location},
+			#{description},
+			#{url},
+			#{profileImageUrl},
+			#{userDomain},
+			#{gender},
+			#{followersCount},
+			#{friendsCount},
+			#{favouritesCount},
+			#{createdAt},
+			#{following},
+			#{verified},
+			#{verifiedType},
+			#{allowAllActMsg},
+			#{allowAllComment},
+			#{followMe},
+			#{avatarLarge},
+			#{onlineStatus},
+			#{biFollowersCount},
+			#{lang},
+			#{verifiedReason},
+			#{weihao},
+			#{statusId},
+			#{statusesCount},
+			#{createDate},
+			#{createBy.id},
+			#{updateDate},
+			#{updateBy.id},
+			#{delFlag},
+			#{remarks},
+			#{unrank},
+			#{abilityTags}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE weibo_user SET 	
+			screen_name = #{screenName},
+			name = #{name},
+			province = #{province},
+			city = #{city},
+			location = #{location},
+			description = #{description},
+			url = #{url},
+			profile_image_url = #{profileImageUrl},
+			user_domain = #{userDomain},
+			gender = #{gender},
+			followers_count = #{followersCount},
+			friends_count = #{friendsCount},
+			favourites_count = #{favouritesCount},
+			created_at = #{createdAt},
+			following = #{following},
+			verified = #{verified},
+			verified_type = #{verifiedType},
+			allow_all_act_msg = #{allowAllActMsg},
+			allow_all_comment = #{allowAllComment},
+			follow_me = #{followMe},
+			avatar_large = #{avatarLarge},
+			online_status = #{onlineStatus},
+			bi_followers_count = #{biFollowersCount},
+			lang = #{lang},
+			verified_reason = #{verifiedReason},
+			weihao = #{weihao},
+			status_id = #{statusId},
+			statuses_count = #{statusesCount},
+			update_date = #{updateDate},
+			update_by = #{updateBy.id},
+			remarks = #{remarks},
+			unrank = #{unrank},
+			ability_tags = #{abilityTags}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE weibo_user SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

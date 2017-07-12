@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.weibo.dao.WeiBoCommentDao">
+    
+	<sql id="weiBoCommentColumns">
+		a.id AS "id",
+		a.weibo_id AS "weiBoId",
+		a.weibo_user_id AS "weiBoUserId",
+		a.comment_user_id AS "commentUserId",
+		a.comment_text AS "commentText",
+		a.created_at AS "createdAt",
+		a.create_date AS "createDate",
+		a.create_by AS "createBy.id",
+		a.update_date AS "updateDate",
+		a.update_by AS "updateBy.id",
+		a.del_flag AS "delFlag",
+		a.remarks AS "remarks"
+	</sql>
+	
+	<sql id="weiBoCommentJoins">
+	</sql>
+    
+	<select id="get" resultType="WeiBoComment">
+		SELECT 
+			<include refid="weiBoCommentColumns"/>
+		FROM weibo_comment a
+		<include refid="weiBoCommentJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="WeiBoComment">
+		SELECT 
+			<include refid="weiBoCommentColumns"/>
+		FROM weibo_comment a
+		<include refid="weiBoCommentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="weiBoId !=null and weiBoId != ''">
+				AND a.weibo_id =#{weiBoId}
+			</when>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="WeiBoComment">
+		SELECT 
+			<include refid="weiBoCommentColumns"/>
+		FROM weibo_comment a
+		<include refid="weiBoCommentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO weibo_comment(
+			id,
+			weibo_id,
+			weibo_user_id,
+			comment_user_id,
+			comment_text,
+			created_at,
+			create_date,
+			create_by,
+			update_date,
+			update_by,
+			del_flag,
+			remarks
+		) VALUES (
+			#{id},
+			#{weiBoId},
+			#{weiBoUserId},
+			#{commentUserId},
+			#{commentText},
+			#{createdAt},
+			#{createDate},
+			#{createBy.id},
+			#{updateDate},
+			#{updateBy.id},
+			#{delFlag},
+			#{remarks}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE weibo_comment SET 	
+			weibo_id = #{weiBoId},
+			weibo_user_id = #{weiBoUserId},
+			comment_user_id = #{commentUserId},
+			comment_text = #{commentText},
+			created_at = #{createdAt},
+			update_date = #{updateDate},
+			update_by = #{updateBy.id},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE weibo_comment SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>
