@@ -44,7 +44,8 @@ public class ReceiveMessageService implements ServletContextListener {
      * 初始化httpclient，并启动获取数据线程
      */
     public void init() {
-        this.streamingUrlList.add("http://c.api.weibo.com/datapush/comment?subid=10823");
+        this.streamingUrlList.add("https://c.api.weibo.com/commercial/push?subid=10823");
+        //新版订阅服务已经上线，新版服务的稳定性更高，建议开发者使用使用新版订阅服务（旧版订阅服务目前可以继续使用）。订阅微博和评论是一个接口，地址为：commercial/push
         //this.streamingUrlList.add("http://c.api.weibo.com/datapush/status?subid=10718");
         this.httpConnManager = new MultiThreadedHttpConnectionManager();
         this.httpConnManager.getParams().setMaxConnectionsPerHost(HostConfiguration.ANY_HOST_CONFIGURATION, 10);
@@ -142,7 +143,7 @@ public class ReceiveMessageService implements ServletContextListener {
                 WeiBoPostService service=new WeiBoPostService();
                 service.receiveMessage(message);
             }else{
-                //System.out.println(rs.toString());
+                 //System.out.println(rs.toString());
             }
         }
 
