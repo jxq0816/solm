@@ -79,17 +79,25 @@ public class WeiBoKeywordController extends BaseController {
 	@RequestMapping(value = "delete")
 	public String delete(WeiBoKeyword weiBoKeyword, RedirectAttributes redirectAttributes) {
 		String rs;
+		weiBoKeywordService.delete(weiBoKeyword);
+		rs="删除微博关键字成功";
+		addMessage(redirectAttributes, rs);
+		return "redirect:"+Global.getAdminPath()+"/weibo/weiBoKeyword/?repage";
+	}
+	@RequiresPermissions("weibo:weiBoKeyword:edit")
+	@RequestMapping(value = "unsubscribe")
+	public String unsubscribe(WeiBoKeyword weiBoKeyword, RedirectAttributes redirectAttributes) {
+		String rs;
 		String json=weiBoPostService.updateSubscribeDelKeyWord(weiBoKeyword.getKeyword(),"");
-		JSONObject obj=JSONObject.parseObject(json);
+		JSONObject obj= JSONObject.parseObject(json);
 		String errorCode=obj.getString("error_code");
 		if(StringUtils.isNoneBlank(errorCode)){
 			rs=obj.getString("error");
 		}else{
-			weiBoKeywordService.delete(weiBoKeyword);
 			rs="删除微博关键字成功";
+			weiBoKeywordService.delete(weiBoKeyword);
 		}
 		addMessage(redirectAttributes, rs);
 		return "redirect:"+Global.getAdminPath()+"/weibo/weiBoKeyword/?repage";
 	}
-
 }
