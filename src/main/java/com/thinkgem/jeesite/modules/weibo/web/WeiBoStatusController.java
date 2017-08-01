@@ -123,40 +123,47 @@ public class WeiBoStatusController extends BaseController {
 	@RequestMapping(value = "receiveKeyWordMessage")
 	@ResponseBody
 	public String receiveKeyWordMessage(String message) throws IOException, JSONException {
-		if(StringUtils.isNoneBlank(message)){
-			message= Base64Util.decode(message);
-			JSONObject rs= JSON.parseObject(message);
-			JSONObject matchInfo = rs.getJSONObject("match_info");
-			String keyword=matchInfo.getString("keyword");//关键字
-			WeiBoKeyword weiBoKeyword=new WeiBoKeyword();
-			weiBoKeyword.setKeyword(keyword);
-			List<WeiBoKeyword> list = weiBoKeywordService.findList(weiBoKeyword);
-			if(list!=null&&list.size()!=0) {
-				JSONObject text = rs.getJSONObject("text");//订阅
-				JSONObject status = text.getJSONObject("status");
-				String statusText = status.getString("text");//微博正文
-				String weiBoId = status.getString("id");//微博ID
-				JSONObject weiBoUser = status.getJSONObject("user");//消费者
-				String weiBoUserId = weiBoUser.getLong("id").toString();//消费者ID
-				String screenName = weiBoUser.getString("screen_name");//消费者昵称
-				//System.out.println("weiBoUser="+weiBoUser.toString());
-				//System.out.println("weiBoUserId="+weiBoUserId);
-				Date createAt = new Date(status.getString("created_at"));
-				WeiBoStatus weiBo = new WeiBoStatus();
-				weiBo.setText(statusText);
-				weiBo.setKeyword(keyword);
-				weiBo.setWeiboUserId(weiBoUserId);
-				weiBo.setScreenName(screenName);
-				weiBo.setId(weiBoId);
-				weiBo.setCreatedAt(createAt);
-				weiBo.setRemarks(status.toString());
-				String msg=weiBoStatusService.insert(weiBo);
-				return keyword+"订阅微博"+msg;
-			}else{
-				return "非订阅微博，舍弃";
+		String rs="";
+		if (StringUtils.isNoneBlank(message)) {
+			message = Base64Util.decode(message);
+			JSONObject ms = JSON.parseObject(message);
+			JSONObject matchInfo = ms.getJSONObject("match_info");
+			String keywordString = matchInfo.getString("keyword");
+			keywordString=keywordString.substring(1,keywordString.length()-1);
+			String[] array=keywordString.split(",");
+			for (int i=0;i<array.length;i++) {
+				String keyword = array[i].trim();
+				WeiBoKeyword weiBoKeyword = new WeiBoKeyword();
+				weiBoKeyword.setKeyword(keyword);
+				List<WeiBoKeyword> list = weiBoKeywordService.findList(weiBoKeyword);
+				if (list != null && list.size() != 0) {
+					JSONObject text = ms.getJSONObject("text");//订阅
+					JSONObject status = text.getJSONObject("status");
+					String statusText = status.getString("text");//微博正文
+					String weiBoId = status.getString("id");//微博ID
+					JSONObject weiBoUser = status.getJSONObject("user");//消费者
+					String weiBoUserId = weiBoUser.getLong("id").toString();//消费者ID
+					String screenName = weiBoUser.getString("screen_name");//消费者昵称
+					//System.out.println("weiBoUser="+weiBoUser.toString());
+					//System.out.println("weiBoUserId="+weiBoUserId);
+					Date createAt = new Date(status.getString("created_at"));
+					WeiBoStatus weiBo = new WeiBoStatus();
+					weiBo.setText(statusText);
+					weiBo.setKeyword(keyword);
+					weiBo.setWeiboUserId(weiBoUserId);
+					weiBo.setScreenName(screenName);
+					weiBo.setId(weiBoId);
+					weiBo.setCreatedAt(createAt);
+					weiBo.setRemarks(status.toString());
+					String msg = weiBoStatusService.insert(weiBo);
+					rs+= keyword + "订阅微博" + msg;
+				}else{
+					rs+="本地没有配置该关键字"+keyword;
+				}
 			}
-		}else{
-			return "message is null";
+		} else {
+			rs="message is null";
 		}
+		return rs;
 	}
 }
