@@ -136,6 +136,7 @@
 </ul>
 <br/>
 <div class="top">
+    <input id="fansId" name="fansId" value="${fans.id}" type="hidden"/>
     和${fans.screenName}的聊天
 </div>
 <%--用户个人信息 start--%>

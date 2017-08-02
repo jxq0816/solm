@@ -3,13 +3,13 @@
  */
 package com.thinkgem.jeesite.modules.oa.web;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.google.common.collect.Maps;
+import com.thinkgem.jeesite.common.mapper.JsonMapper;
+import com.thinkgem.jeesite.common.persistence.Page;
+import com.thinkgem.jeesite.common.web.BaseController;
+import com.thinkgem.jeesite.modules.oa.entity.Leave;
+import com.thinkgem.jeesite.modules.oa.service.LeaveService;
+import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -24,13 +24,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.google.common.collect.Maps;
-import com.thinkgem.jeesite.common.mapper.JsonMapper;
-import com.thinkgem.jeesite.common.persistence.Page;
-import com.thinkgem.jeesite.common.web.BaseController;
-import com.thinkgem.jeesite.modules.oa.entity.Leave;
-import com.thinkgem.jeesite.modules.oa.service.LeaveService;
-import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 请假Controller
@@ -79,7 +77,7 @@ public class LeaveController extends BaseController {
 
 	/**
 	 * 任务列表
-	 * @param leave	
+	 * @param session
 	 */
 	@RequiresPermissions("oa:leave:view")
 	@RequestMapping(value = {"list/task",""})

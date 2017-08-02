@@ -18,6 +18,8 @@ import com.thinkgem.jeesite.modules.util.weibo.request.WeiBoRequestService;
 import com.thinkgem.jeesite.modules.weibo.entity.WeiBoMail;
 import com.thinkgem.jeesite.modules.weibo.service.WeiBoMailService;
 import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,6 +45,8 @@ import java.util.List;
 @Controller
 @RequestMapping(value = "${adminPath}/weibo/weiboFans")
 public class WeiboFansController extends BaseController {
+
+	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Autowired
 	private WeiBoRequestService weiBoRequestService;
@@ -111,7 +115,8 @@ public class WeiboFansController extends BaseController {
 				weiBoMail.setCreatedAt(createdAt);
 				weiBoMailService.save(weiBoMail);
 				WebSocketUtil webSocketUtil=new WebSocketUtil();
-				boolean bool=webSocketUtil.sendMessage(senderId,senderName,receiverId,receiverName);//调用webSocket，主动更新对话列表
+				logger.error("私信  senderId="+senderId+",senderName="+senderName+",receiverId="+receiverId+",receiverName"+receiverName);
+				boolean bool=webSocketUtil.sendMessage(senderId);//调用webSocket，主动更新对话列表
 				if(bool==false){
 					User user=new User();
 					//System.out.println("receiverId："+receiverId);

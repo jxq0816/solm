@@ -1,5 +1,8 @@
 package com.thinkgem.jeesite.modules.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnOpen;
@@ -22,6 +25,8 @@ import java.util.Map;
 @ServerEndpoint("/websocket/{fansId}")
 public class WebSocketUtil {
 
+    private Logger logger = LoggerFactory.getLogger(getClass());
+
     //静态变量，用来记录当前在线连接数。应该把它设计成线程安全的。
     private static int onlineCount = 0;
 
@@ -40,7 +45,7 @@ public class WebSocketUtil {
         this.session = session;
         webSocketMap.put(fansId, this);     //加入set中
         addOnlineCount();           //在线数加1
-        System.out.println("有新连接加入！当前在线人数为" + getOnlineCount());
+        logger.error("有新连接加入！fansId="+fansId+"当前在线人数为" + getOnlineCount());
     }
 
     /**
@@ -58,7 +63,7 @@ public class WebSocketUtil {
             }
         }
         subOnlineCount();           //在线数减1
-        System.out.println("有一连接关闭！当前在线人数为" + getOnlineCount());
+        logger.error("有一连接关闭！当前在线人数为" + getOnlineCount());
     }
 
     /**
@@ -81,7 +86,7 @@ public class WebSocketUtil {
      */
     @OnError
     public void onError(Session session, Throwable error) {
-        System.out.println("发生错误");
+        logger.error("发生错误");
         error.printStackTrace();
     }
 
@@ -91,15 +96,23 @@ public class WebSocketUtil {
      * @param fansId 粉丝的ID
      * @throws IOException
      */
-    public boolean sendMessage(String fansId,String fansName,String receiverId,String receiverName) throws IOException {
-        //System.out.println("webSocket:" + fansId);
+    public boolean sendMessage(String fansId) throws IOException {
         WebSocketUtil webSocketUtil = webSocketMap.get(fansId);//查找相应的会话
-        //System.out.println("webSocketMap:" + webSocketMap.toString());
-        //System.out.println("webSocketUtil:" + webSocketUtil);
+        logger.error("webSocketMap.size:" + webSocketMap.size());
+        Iterator<Map.Entry<String, WebSocketUtil>> it = webSocketMap.entrySet().iterator();
+        logger.error("webSocketMap.size:" + webSocketMap.size());
+        while(it.hasNext()){
+            Map.Entry entry =  (Map.Entry)it.next();
+            String key = (String)entry.getKey();
+            WebSocketUtil value= (WebSocketUtil) entry.getValue();
+            logger.error("key=" + key+",value="+value);
+        }
         if (webSocketUtil != null) {//客服已打开会话框
+            logger.error("webSocket 推送 前端刷新界面");
             webSocketUtil.session.getBasicRemote().sendText(fansId);//推送到前端
             return true;//用户已经打开会话框
         }else{
+            logger.error("用户没有打开对话框，消息提醒");
             return false;//用户没有打开会话框，需要添加通知提醒
         }
     }
